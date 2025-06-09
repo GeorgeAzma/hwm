@@ -7,402 +7,11 @@
     <title>Sensors</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="utils.js"></script>
-    <style>
-        :root {
-            --bg-color-dark: #0c0c0c;
-            --bg-color-light: #1a1a1a;
-            --text-color: #e0e0e0;
-            --accent-color-1: #8d44f6;
-            --accent-color-2: #44a6f6;
-            --accent-color-3: #44f6d7;
-            --accent-color-4: #f6e044;
-            --accent-color-5: #f6448d;
-            --gradient-1: linear-gradient(135deg, var(--accent-color-1), var(--accent-color-2));
-            --gradient-2: linear-gradient(135deg, var(--accent-color-3), var(--accent-color-4));
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: rgba(0, 0, 0, 0.3);
-            --blur-strength: 10px;
-            --border-radius-main: 20px;
-            --border-radius-card: 12px;
-            --card-padding: 12px;
-            --gap: 16px;
-            overflow-y: scroll;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            margin: 0;
-            padding: var(--gap);
-            color: var(--text-color);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: black;
-            background-image: linear-gradient(135deg, var(--bg-color-light), var(--bg-color-dark));
-        }
-
-        .glass-pane {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius-main);
-            backdrop-filter: blur(var(--blur-strength)) saturate(180%);
-            -webkit-backdrop-filter: blur(var(--blur-strength)) saturate(180%);
-            padding: var(--gap);
-            transition: all 0.3s ease-in-out;
-            position: relative;
-            break-inside: avoid;
-            display: inline-block;
-            width: 100%;
-            margin-bottom: var(--gap);
-            box-sizing: border-box;
-        }
-
-        .glass-pane:hover {
-            box-shadow: 0 12px 40px 0 var(--glass-shadow);
-            transform: translateY(-2px);
-        }
-
-        .dashboard-container {
-            columns: 350px;
-            column-gap: var(--gap);
-            column-fill: balance;
-            max-width: 1800px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        .sensor-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--card-padding);
-            padding: 12px;
-        }
-
-        .sensor-group h2 {
-            font-size: 1.25em;
-            margin: 0;
-            color: rgba(129, 138, 150, 0.5);
-            text-align: center;
-        }
-
-        .sensor-card {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: var(--border-radius-card);
-            padding: var(--card-padding);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sensor-card:has(.progress-bar) {
-            padding-bottom: 0px;
-            padding-inline: 0px;
-        }
-
-        .sensor-card:has(.progress-bar) .sensor-value-container {
-            margin-right: var(--card-padding);
-            margin-bottom: calc(var(--card-padding) * 0.5);
-        }
-
-        .sensor-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .sensor-card .icon-value {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.1em;
-            font-weight: 500;
-        }
-
-        .sensor-card .sensor-icon {
-            font-size: 1.5em;
-            width: 30px;
-            flex-shrink: 0;
-            text-align: center;
-            background: var(--gradient-1);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: background 0.3s ease;
-        }
-
-        .sensor-card:has(.progress-bar) .sensor-icon {
-            margin-left: var(--card-padding);
-        }
-
-        .sensor-card .sensor-label {
-            font-size: 0.9em;
-            color: #b0b0b0;
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .sensor-card .sensor-value-container {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            margin-left: auto;
-            flex-shrink: 0;
-        }
-
-        .sensor-group.cpu .sensor-icon {
-            background: linear-gradient(90deg, #f6448d, #f69b44);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sensor-group.gpu .sensor-icon {
-            background: linear-gradient(90deg, #f6e044, #f6b544);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sensor-group.ram .sensor-icon {
-            background: linear-gradient(90deg, #8d44f6, #f644e9);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sensor-group.network .sensor-icon {
-            background: linear-gradient(90deg, #44f6d7, #44f68d);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sensor-group.fans .sensor-icon {
-            background: linear-gradient(90deg, #f644e9, #44f1b5);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sensor-group.storage .sensor-icon {
-            background: linear-gradient(90deg, #44a6f6, #8d44f6);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sensor-group.storage .progress-bar-fill {
-            background: linear-gradient(90deg, #44a6f6, #8d44f6);
-        }
-
-        .sensor-card .sensor-value {
-            font-weight: bold;
-            color: var(--text-color);
-            font-size: 1.1em;
-            transition: all 0.2s ease-out;
-        }
-
-        .sensor-card .sensor-unit {
-            font-weight: 500;
-            color: var(--text-color);
-            opacity: 0.7;
-            font-size: 0.9em;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background-color: rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--gradient-1);
-            border-radius: 16px;
-        }
-
-        .sensor-group.cpu .progress-bar-fill {
-            background: linear-gradient(90deg, #f6448d, #f69b44);
-        }
-
-        .sensor-group.gpu .progress-bar-fill {
-            background: linear-gradient(90deg, #f6e044, #f6b544);
-        }
-
-        .sensor-group.ram .progress-bar-fill {
-            background: linear-gradient(90deg, #8d44f6, #f644e9);
-        }
-
-        .sensor-group.fans .progress-bar-fill {
-            background: linear-gradient(90deg, #f644e9, #44f1b5);
-        }
-
-        @media (max-width: 992px) {
-            .dashboard-container {
-                columns: 300px;
-            }
-
-            .sensor-card .icon-value {
-                font-size: 1.05em;
-                gap: 10px;
-            }
-
-            .sensor-card .sensor-label {
-                font-size: 0.85em;
-            }
-        }
-
-        @media (max-width: 1400px) {
-            .dashboard-container {
-                columns: 320px;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .dashboard-container {
-                columns: 300px;
-            }
-        }
-
-        @media (max-width: 800px) {
-            .dashboard-container {
-                columns: 280px;
-                width: 95%;
-            }
-
-            .glass-pane {
-                padding: var(--card-padding);
-            }
-
-            .sensor-card {
-                padding: 12px;
-            }
-
-            .sensor-card .icon-value {
-                font-size: 1em;
-                gap: 10px;
-            }
-
-            .sensor-card .sensor-icon {
-                font-size: 1.3em;
-                width: 25px;
-            }
-
-            .sensor-card .sensor-label {
-                font-size: 0.85em;
-            }
-
-            .sensor-card .sensor-value {
-                font-size: 1em;
-            }
-
-            .sensor-card .sensor-unit {
-                font-size: 0.85em;
-            }
-
-            .sensor-group h2 {
-                font-size: 1.2em;
-            }
-        }
-
-        .cpu-graph-container {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            overflow: hidden;
-        }
-
-        .cpu-core-bar {
-            display: flex;
-            align-items: center;
-            height: 12px;
-            background: linear-gradient(65deg, rgba(66, 0, 255, 0.04), rgba(255, 1, 1, 0.01));
-            border-radius: 16px;
-            padding: 4px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(2px);
-        }
-
-        .cpu-core-bar-fill {
-            height: 100%;
-            position: relative;
-            border-radius: 16px;
-        }
-
-        /* Load graph gradient - Using UI colors (Pink to Orange like CPU theme) */
-        .loads-graph .cpu-core-bar-fill {
-            background: linear-gradient(90deg,
-                    rgba(68, 166, 246, 0.9) 0%,
-                    rgba(68, 246, 215, 0.9) 100%);
-            box-shadow: 0 0 8px rgba(246, 68, 141, 0.3);
-        }
-
-        /* Temperature graph gradient - Using UI colors (Blue to Cyan like GPU theme) */
-        .temps-graph .cpu-core-bar-fill {
-            background: linear-gradient(90deg,
-                    rgba(246, 68, 141, 0.9) 0%,
-                    rgba(246, 155, 68, 0.9) 100%);
-            box-shadow: 0 0 8px rgba(68, 166, 246, 0.3);
-        }
-
-        /* Clock graph gradient - Using UI colors (Purple to Pink like RAM theme) */
-        .clocks-graph .cpu-core-bar-fill {
-            background: linear-gradient(90deg,
-                    rgba(255, 75, 174, 0.8) 0%,
-                    rgba(94, 182, 255, 0.9) 100%);
-            box-shadow: 0 0 8px rgba(141, 68, 246, 0.3);
-        }
-
-        .cpu-core-bar-value {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-55%);
-            font-size: 0.8em;
-            font-weight: 700;
-            color: transparent;
-            text-shadow: 0px 0px 2px #000;
-            opacity: 0.4;
-            color: #aab;
-            z-index: 2;
-            white-space: nowrap;
-        }
-
-        /* Hover effects */
-        .cpu-core-bar:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .loads-graph .cpu-core-bar:hover .cpu-core-bar-fill {
-            box-shadow: 0 0 12px rgba(246, 68, 141, 0.5);
-        }
-
-        .temps-graph .cpu-core-bar:hover .cpu-core-bar-fill {
-            box-shadow: 0 0 12px rgba(68, 166, 246, 0.5);
-        }
-
-        .clocks-graph .cpu-core-bar:hover .cpu-core-bar-fill {
-            box-shadow: 0 0 12px rgba(141, 68, 246, 0.5);
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="dashboard-container">
-
-        <!-- CPU Load & Performance -->
+    <div id="dashboard-container">
         <div class="glass-pane sensor-group cpu">
             <h2 id="cpu">CPU</h2>
             <div class="sensor-card">
@@ -457,8 +66,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- CPU Temperatures -->
         <div class="glass-pane sensor-group cpu">
             <h2>CPU Temps</h2>
             <div class="sensor-card">
@@ -499,28 +106,19 @@
             </div>
             <div class="" id="cpu-core-temps-section">
                 <div class="cpu-graph-container temps-graph">
-                    <!-- Core temperature graph bars will be dynamically generated here -->
                 </div>
             </div>
         </div>
-
-        <!-- Voltage -->
         <div class="glass-pane sensor-group cpu" id="cpu-core-loads-section">
             <h2>Core Load</h2>
             <div class="cpu-graph-container loads-graph">
-                <!-- Core load graph bars will be dynamically generated here -->
             </div>
         </div>
-
-        <!-- CPU Core Clocks - Graph Style -->
         <div class="glass-pane sensor-group cpu" id="cpu-core-clocks-section">
             <h2>Core Clock</h2>
             <div class="cpu-graph-container clocks-graph">
-                <!-- Core clock graph bars will be dynamically generated here -->
             </div>
         </div>
-
-        <!-- GPU Sensors -->
         <div class="glass-pane sensor-group gpu">
             <h2>GPU</h2>
             <div class="sensor-card">
@@ -613,7 +211,7 @@
                     </div>
                 </div>
             </div>
-        </div> <!-- Memory -->
+        </div>
         <div class="glass-pane sensor-group ram">
             <h2>Memory</h2>
             <div class="sensor-card">
@@ -641,13 +239,10 @@
                     <div class="progress-bar-fill" id="virtual-memory-combined-bar"></div>
                 </div>
             </div>
-        </div><!-- Fans -->
+        </div>
         <div class="glass-pane sensor-group fans" id="fans-section">
             <h2>Fans</h2>
-            <!-- Fan cards will be dynamically generated here -->
         </div>
-
-        <!-- Network -->
         <div class="glass-pane sensor-group network">
             <h2>Network</h2>
             <div class="sensor-card">
@@ -687,40 +282,39 @@
                 </div>
             </div>
         </div>
-
-        <!-- Storage -->
-        <div class="glass-pane sensor-group storage" id="storage-section">
-            <!-- Storage cards will be dynamically generated here -->
-        </div>
     </div>
-    <script>
-
-        // Global map to store flattened sensor data by SensorId for quick lookup
-        const flatSensorData = {};
-
-        // Cache DOM elements to avoid repeated queries
-        const domElementCache = new Map();
-
-        // Flag to track if headers have been initialized
-        let headersInitialized = false;        // Global storage for hardware names
+    <script>        function createCard(icon, label, valueId, unit, barId = null) {
+            return `<div class="sensor-card">
+                <div class="icon-value">
+                    <i class="${icon} sensor-icon"></i>
+                    <span class="sensor-label">${label}</span>
+                    <div class="sensor-value-container">
+                        <span class="sensor-value" id="${valueId}"></span><span class="sensor-unit">${unit}</span>
+                    </div>
+                </div>` + (barId ? `
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="${barId}"></div>
+                </div>
+            </div>` : `
+            </div>`);
+        } const flatSensorData = {};
+        const domElementCache = new Map(); let headersInitialized = false;
         const hardwareNames = {
             cpu: 'CPU',
             gpu: 'GPU',
             memory: 'Memory',
             network: 'Network',
             storage: 'Storage'
-        };// Function to get cached DOM element
+        };
+
         function getCachedElement(id) {
             if (!domElementCache.has(id)) {
                 domElementCache.set(id, document.getElementById(id));
             }
             return domElementCache.get(id);
         }
-
-        // Function to recursively flatten the nested JSON structure
         function flattenSensors(node, clearFirst = false) {
             if (clearFirst) {
-                // Only clear when explicitly requested (first time or structure change)
                 for (const key in flatSensorData)
                     delete flatSensorData[key];
             }
@@ -732,27 +326,21 @@
                 node.Children.forEach(child => flattenSensors(child, false));
             }
         }
-
-        // Function to extract hardware names from the API response
         function extractHardwareNames(data) {
             function findHardwareByType(node) {
                 if (node.Type) {
-                    // Check for CPU
                     if (node.Type === 'Cpu' && node.Text) {
                         hardwareNames.cpu = node.Text.replace(/Intel|AMD|Core|Ryzen|Processor/ig, '').trim();
                     }
-                    // Check for GPU  
                     else if ((node.Type === 'GpuNvidia' || node.Type === 'GpuAmd' || node.Type === 'Gpu') && node.Text) {
                         hardwareNames.gpu = node.Text.replace(/NVIDIA|GeForce|AMD|Radeon/ig, '').trim();
                     }
-                    // Check for Memory
                     else if (node.Type === 'Memory' && node.Text) {
                         hardwareNames.memory = node.Text.replace(/Generic Memory/ig, 'Memory').trim();
-                    }                    // Check for Network
+                    }
                     else if (node.Type === 'Network' && node.Text) {
                         hardwareNames.network = node.Text;
                     }
-                    // Check for Storage
                     else if (node.Type === 'Storage' && node.Text) {
                         hardwareNames.storage = node.Text;
                     }
@@ -765,16 +353,11 @@
 
             findHardwareByType(data);
         }
-
-        // Function to update section headers with hardware names (only run once)
         function updateSectionHeaders() {
-            if (headersInitialized) return; // Skip if already initialized
+            if (headersInitialized) return;
 
-            // Cache header elements for reuse
-            const cpu = document.getElementById('cpu');
-            cpu.textContent = hardwareNames.cpu;
+            const cpu = document.getElementById('cpu'); cpu.textContent = hardwareNames.cpu;
 
-            // Update other sections
             const gpuSection = document.querySelector('.sensor-group.gpu h2');
             if (gpuSection) {
                 gpuSection.textContent = hardwareNames.gpu;
@@ -794,18 +377,13 @@
             }
 
             headersInitialized = true;
-        }        // Dynamic CPU core sections generation
-        let cpuCoresGenerated = false;
+        } let cpuCoresGenerated = false;
         let fansGenerated = false;
         let storageGenerated = false;
-        let dynamicSensorMapping = {}; // Store dynamically generated sensor mappings
-        let fanCardElements = {}; // Store references to fan card DOM elements for visibility control
+        let dynamicSensorMapping = {};
+        let fanCardElements = {}; function generateCpuCoreSections(data) {
+            if (cpuCoresGenerated) return;
 
-        // Function to generate CPU core sensor cards dynamically
-        function generateCpuCoreSections(data) {
-            if (cpuCoresGenerated) return; // Only generate once
-
-            // Find CPU core data from the API response
             const cpuCoreLoads = [];
             const cpuCoreTemps = [];
             const cpuCoreClocks = [];
@@ -824,17 +402,13 @@
                     node.Children.forEach(child => extractCpuCoreData(child));
                 }
             }
-            extractCpuCoreData(data);
-
-            // Generate CPU Core Loads section
-            const loadsSection = document.getElementById('cpu-core-loads-section');
+            extractCpuCoreData(data); const loadsSection = document.getElementById('cpu-core-loads-section');
             if (loadsSection && cpuCoreLoads.length > 0) {
                 const graphContainer = loadsSection.querySelector('.cpu-graph-container');
                 cpuCoreLoads.forEach((coreLoad, index) => {
                     const coreBar = createCpuCoreBar(coreLoad, '%');
                     graphContainer.appendChild(coreBar);
 
-                    // Add to dynamic sensor mapping
                     const htmlId = generateHtmlId(coreLoad.Text, 'load');
                     dynamicSensorMapping[htmlId] = {
                         apiId: coreLoad.SensorId,
@@ -844,7 +418,6 @@
                 });
             }
 
-            // Generate CPU Core Temperatures section
             const tempsSection = document.getElementById('cpu-core-temps-section');
             if (tempsSection && cpuCoreTemps.length > 0) {
                 const graphContainer = tempsSection.querySelector('.cpu-graph-container');
@@ -852,7 +425,6 @@
                     const coreBar = createCpuCoreBar(coreTemp, '°C');
                     graphContainer.appendChild(coreBar);
 
-                    // Add to dynamic sensor mapping
                     const htmlId = generateHtmlId(coreTemp.Text, 'temp');
                     dynamicSensorMapping[htmlId] = {
                         apiId: coreTemp.SensorId,
@@ -862,7 +434,6 @@
                 });
             }
 
-            // Generate CPU Core Clocks section
             const clocksSection = document.getElementById('cpu-core-clocks-section');
             if (clocksSection && cpuCoreClocks.length > 0) {
                 const graphContainer = clocksSection.querySelector('.cpu-graph-container');
@@ -870,7 +441,6 @@
                     const coreBar = createCpuCoreBar(coreClock, 'GHz');
                     graphContainer.appendChild(coreBar);
 
-                    // Add to dynamic sensor mapping
                     const htmlId = generateHtmlId(coreClock.Text, 'clock');
                     dynamicSensorMapping[htmlId] = {
                         apiId: coreClock.SensorId,
@@ -881,14 +451,12 @@
                 });
             } cpuCoresGenerated = true;
         }
-
         function generateFanSections(data) {
-            if (fansGenerated) return; // Only generate once
+            if (fansGenerated) return;
 
             const fanSensors = [];
             const fanControls = [];
 
-            // Extract all fan sensors and controls from the API response
             function extractFanData(node) {
                 if (node.Type === 'Fan' && node.SensorId && node.Text) {
                     fanSensors.push(node);
@@ -901,22 +469,16 @@
                     node.Children.forEach(child => extractFanData(child));
                 }
             }
-            extractFanData(data);
-
-            const fansSection = document.getElementById('fans-section');
+            extractFanData(data); const fansSection = document.getElementById('fans-section');
             if (fansSection && fanSensors.length > 0) {
-                // Create a map to match fan sensors with their controls
                 const fanControlMap = {};
                 fanControls.forEach(control => {
-                    // Try to match fan controls with fan sensors by name
                     const controlName = control.Text.toLowerCase().replace(/\s+/g, ' ').trim();
                     const matchingFan = fanSensors.find(fan => {
                         const fanName = fan.Text.toLowerCase().replace(/\s+/g, ' ').trim();
 
-                        // Direct name match
                         if (fanName === controlName) return true;
 
-                        // Check if control name contains fan name (without "fan" word)
                         const fanNameClean = fanName.replace(/\bfan\b/g, '').trim();
                         const controlNameClean = controlName.replace(/\bfan\b/g, '').trim();
 
@@ -925,7 +487,6 @@
                             return true;
                         }
 
-                        // Check for GPU fan specific matching
                         if (fanName.includes('gpu') && controlName.includes('gpu')) {
                             const fanNumber = fanName.match(/(\d+)/);
                             const controlNumber = controlName.match(/(\d+)/);
@@ -939,22 +500,18 @@
                     if (matchingFan) {
                         fanControlMap[matchingFan.SensorId] = control;
                     }
-                });                // Generate fan cards for each fan sensor
-                fanSensors.forEach(fanSensor => {
+                }); fanSensors.forEach(fanSensor => {
                     const fanCard = createFanCard(fanSensor, fanControlMap[fanSensor.SensorId]);
                     fansSection.appendChild(fanCard);
 
-                    // Store reference to the fan card for visibility control
                     const rpmHtmlId = generateHtmlId(fanSensor.Text, 'rpm');
                     fanCardElements[rpmHtmlId] = fanCard;
 
-                    // Add to dynamic sensor mapping for RPM values
                     dynamicSensorMapping[rpmHtmlId] = {
                         apiId: fanSensor.SensorId,
                         type: 'Fan',
                         fixed: 0
-                    };// Add control mapping if available
-                    const matchingControl = fanControlMap[fanSensor.SensorId];
+                    }; const matchingControl = fanControlMap[fanSensor.SensorId];
                     if (matchingControl) {
                         const controlHtmlId = generateHtmlId(fanSensor.Text, 'control');
                         dynamicSensorMapping[controlHtmlId] = {
@@ -966,39 +523,28 @@
                 });
             } fansGenerated = true;
         }
-
         function createFanCard(fanSensor, controlSensor) {
             const rpmHtmlId = generateHtmlId(fanSensor.Text, 'rpm');
             const controlHtmlId = generateHtmlId(fanSensor.Text, 'control');
 
-            const card = document.createElement('div');
-            card.className = 'sensor-card';
-
             const hasControl = controlSensor !== undefined;
 
-            card.innerHTML = `
-        <div class="icon-value">
-            <i class="fas fa-fan sensor-icon"></i>
-            <span class="sensor-label">${fanSensor.Text}</span>
-            <div class="sensor-value-container">
-                <span class="sensor-value" id="${rpmHtmlId}"></span><span class="sensor-unit">RPM</span>
-            </div>
-        </div>
-        ${hasControl ? `<div class="progress-bar">
-            <div class="progress-bar-fill" id="${controlHtmlId}-bar"></div>
-        </div>` : ''}
-    `;
+            const card = document.createElement('div');
+            card.innerHTML = createCard(
+                'fas fa-fan',
+                fanSensor.Text,
+                rpmHtmlId,
+                'RPM',
+                hasControl ? `${controlHtmlId}-bar` : null
+            );
 
-            return card;
+            return card.firstElementChild;
         }
-
-        // Function to generate storage sections dynamically from API data
         function generateStorageSections(data) {
-            if (storageGenerated) return; // Only generate once
+            if (storageGenerated) return;
 
             const storageDevices = [];
 
-            // Extract all storage devices from the API response
             function extractStorageData(node) {
                 if (node.Type === 'Storage' && node.Text && node.Children) {
                     storageDevices.push(node);
@@ -1010,7 +556,7 @@
             }
             extractStorageData(data);
 
-            const storageSection = document.getElementById('storage-section');
+            const storageSection = document.getElementById('dashboard-container');
             if (storageSection && storageDevices.length > 0) {
                 storageDevices.forEach(storageDevice => {
                     const storageCard = createStorageDevice(storageDevice);
@@ -1020,13 +566,10 @@
 
             storageGenerated = true;
         }
-
-        // Function to create a storage device card element
         function createStorageDevice(storageDevice) {
             const deviceName = storageDevice.Text;
             const devicePrefix = storageDevice.Children[0]?.Children[0]?.SensorId?.split('/').slice(0, 3).join('/') || '';
 
-            // Collect all sensor data for this storage device
             const sensors = {
                 temperatures: [],
                 usedSpace: null,
@@ -1040,7 +583,6 @@
                 powerOnHours: null
             };
 
-            // Parse storage device sensors
             function parseSensors(node) {
                 if (node.Type === 'Temperature' && node.SensorId) {
                     sensors.temperatures.push(node);
@@ -1078,25 +620,18 @@
             }
             parseSensors(storageDevice);
 
-            // Generate HTML IDs and register sensor mappings
-            const sensorCards = [];            // Used Space with progress bar
+            const sensorCards = [];
+
             if (sensors.usedSpace) {
                 const usedSpaceId = generateHtmlId(deviceName + '-used-space', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-hdd sensor-icon"></i>
-                            <span class="sensor-label">Storage</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${usedSpaceId}"></span><span class="sensor-unit">GB</span>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-bar-fill" id="${usedSpaceId}-bar"></div>
-                        </div>
-                    </div>
-                `);
+                sensorCards.push(createCard(
+                    'fas fa-hdd',
+                    'Storage',
+                    usedSpaceId,
+                    'GB',
+                    `${usedSpaceId}-bar`
+                ));
 
                 dynamicSensorMapping[usedSpaceId] = {
                     apiId: sensors.usedSpace.SensorId,
@@ -1105,24 +640,16 @@
                     formatter: (value) => formatStorageCapacity(value, deviceName),
                     fixed: 1
                 };
-            }            // Total Activity (Utilization)
-            if (sensors.totalActivity) {
+            } if (sensors.totalActivity) {
                 const totalActivityId = generateHtmlId(deviceName + '-total-activity', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-chart-line sensor-icon"></i>
-                            <span class="sensor-label">Utilization</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${totalActivityId}"></span><span class="sensor-unit">%</span>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-bar-fill" id="${totalActivityId}-bar"></div>
-                        </div>
-                    </div>
-                `);
+                sensorCards.push(createCard(
+                    'fas fa-chart-line',
+                    'Utilization',
+                    totalActivityId,
+                    '%',
+                    `${totalActivityId}-bar`
+                ));
 
                 dynamicSensorMapping[totalActivityId] = {
                     apiId: sensors.totalActivity.SensorId,
@@ -1130,141 +657,87 @@
                     barMax: 100,
                     fixed: 1
                 };
-            }
-
-            // Read Rate
-            if (sensors.readRate) {
+            } if (sensors.readRate) {
                 const readRateId = generateHtmlId(deviceName + '-read-rate', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-download sensor-icon"></i>
-                            <span class="sensor-label">Read</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${readRateId}">0</span><span class="sensor-unit">MB/s</span>
-                            </div>
-                        </div>
-                    </div>
-                `);
-
-                dynamicSensorMapping[readRateId] = {
+                sensorCards.push(createCard(
+                    'fas fa-download',
+                    'Read',
+                    readRateId,
+                    'MB/s'
+                )); dynamicSensorMapping[readRateId] = {
                     apiId: sensors.readRate.SensorId,
                     type: 'Throughput',
-                    parseFactor: 1 / 1000000, // Convert B/s to MB/s
+                    parseFactor: 1 / 1000000,
                     fixed: 1
                 };
-            }
-
-            // Write Rate
-            if (sensors.writeRate) {
+            } if (sensors.writeRate) {
                 const writeRateId = generateHtmlId(deviceName + '-write-rate', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-upload sensor-icon"></i>
-                            <span class="sensor-label">Write</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${writeRateId}">0</span><span class="sensor-unit">MB/s</span>
-                            </div>
-                        </div>
-                    </div>
-                `);
-
-                dynamicSensorMapping[writeRateId] = {
+                sensorCards.push(createCard(
+                    'fas fa-upload',
+                    'Write',
+                    writeRateId,
+                    'MB/s'
+                )); dynamicSensorMapping[writeRateId] = {
                     apiId: sensors.writeRate.SensorId,
                     type: 'Throughput',
-                    parseFactor: 1 / 1000000, // Convert B/s to MB/s
+                    parseFactor: 1 / 1000000,
                     fixed: 1
                 };
-            }
-
-            // Temperatures
-            sensors.temperatures.forEach((tempSensor, index) => {
+            } sensors.temperatures.forEach((tempSensor, index) => {
                 const tempId = generateHtmlId(deviceName + `-temp-${index}`, 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-thermometer-half sensor-icon"></i>
-                            <span class="sensor-label">${tempSensor.Text}</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${tempId}">0</span><span class="sensor-unit">°C</span>
-                            </div>
-                        </div>
-                    </div>
-                `);
-
-                dynamicSensorMapping[tempId] = {
+                sensorCards.push(createCard(
+                    'fas fa-thermometer-half',
+                    tempSensor.Text,
+                    tempId,
+                    '°C'
+                )); dynamicSensorMapping[tempId] = {
                     apiId: tempSensor.SensorId,
                     type: 'Temperature',
-                    barMax: 100, // Assume max temp of 100°C for storage
+                    barMax: 100,
                     fixed: 0
                 };
-            });
-
-            // Data Read Total
-            if (sensors.dataRead) {
+            }); if (sensors.dataRead) {
                 const dataReadId = generateHtmlId(deviceName + '-data-read', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-database sensor-icon"></i>
-                            <span class="sensor-label">Total Read</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${dataReadId}">0</span><span class="sensor-unit">GB</span>
-                            </div>
-                        </div>
-                    </div>
-                `);
+                sensorCards.push(createCard(
+                    'fas fa-database',
+                    'Total Read',
+                    dataReadId,
+                    'GB'
+                ));
 
                 dynamicSensorMapping[dataReadId] = {
                     apiId: sensors.dataRead.SensorId,
                     type: 'Data',
                     fixed: 0
                 };
-            }
-
-            // Data Written Total
-            if (sensors.dataWritten) {
+            } if (sensors.dataWritten) {
                 const dataWrittenId = generateHtmlId(deviceName + '-data-written', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-database sensor-icon"></i>
-                            <span class="sensor-label">Total Written</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${dataWrittenId}">0</span><span class="sensor-unit">GB</span>
-                            </div>
-                        </div>
-                    </div>
-                `);
+                sensorCards.push(createCard(
+                    'fas fa-database',
+                    'Total Written',
+                    dataWrittenId,
+                    'GB'
+                ));
 
                 dynamicSensorMapping[dataWrittenId] = {
                     apiId: sensors.dataWritten.SensorId,
                     type: 'Data',
                     fixed: 0
                 };
-            }
-
-            // Power On Hours
-            if (sensors.powerOnHours) {
+            } if (sensors.powerOnHours) {
                 const powerOnHoursId = generateHtmlId(deviceName + '-power-on-hours', 'value');
 
-                sensorCards.push(`
-                    <div class="sensor-card">
-                        <div class="icon-value">
-                            <i class="fas fa-clock sensor-icon"></i>
-                            <span class="sensor-label">Power On Time</span>
-                            <div class="sensor-value-container">
-                                <span class="sensor-value" id="${powerOnHoursId}">0</span><span class="sensor-unit"></span>
-                            </div>
-                        </div>
-                    </div>
-                `);
+                sensorCards.push(createCard(
+                    'fas fa-clock',
+                    'Power On Time',
+                    powerOnHoursId,
+                    ''
+                ));
 
                 dynamicSensorMapping[powerOnHoursId] = {
                     apiId: sensors.powerOnHours.SensorId,
@@ -1276,15 +749,13 @@
 
 
             const card = document.createElement('div');
-            card.className = 'sensor-group';
+            card.className = 'glass-pane sensor-group';
             card.innerHTML = `<h2>${deviceName}</h2>
                 ${sensorCards.join('')}
                 `;
 
             return card;
         }
-
-        // Function to generate HTML ID from sensor text
         function generateHtmlId(sensorText, type) {
             return sensorText.toLowerCase()
                 .replace(/cpu core #(\d+)/g, 'cpu-core$1')
@@ -1293,7 +764,7 @@
                 .replace(/system fan #(\d+)/g, 'system-fan$1')
                 .replace(/\s+/g, '-')
                 .replace(/[^a-z0-9-]/g, '') + '-' + type;
-        }// Function to create a CPU core graph bar element
+        }
         function createCpuCoreBar(sensor, unit) {
             const htmlId = generateHtmlId(sensor.Text, unit === '%' ? 'load' : (unit === '°C' ? 'temp' : 'clock'));
             const bar = document.createElement('div');
@@ -1307,36 +778,29 @@
 
             return bar;
         }
-        // Helper to parse numeric value from sensor value string (e.g., "45.5 °C" -> 45.5)
         function parseValue(valueString) {
             if (!valueString) return NaN;
-            // Regex to find numbers (integers or floats) at the beginning of the string
             const match = valueString.match(/(-?\d+(\.\d+)?)/);
             return match ? parseFloat(match[1]) : NaN;
-        }        // Custom formatter for VRAM display with used/total format
+        }
         function formatVRAM(usedValue) {
             if (isNaN(usedValue)) return '';
 
-            // Get total VRAM from the barApiId sensor
             const totalSensor = flatSensorData['/gpu-nvidia/0/smalldata/2'];
             if (totalSensor && totalSensor.Value !== undefined) {
                 let totalValue = parseValue(totalSensor.Value);
                 if (!isNaN(totalValue)) {
-                    // Convert from MB to GB (same factor as used value)
                     totalValue /= 1024;
                     return `${usedValue.toFixed(1)} / ${totalValue.toFixed(0)}`;
                 }
             }
 
-            // Fallback to just showing used value if total is not available yet
             return usedValue.toFixed(1);
         }
 
-        // Custom formatter for memory display with used/total format
         function formatMemory(usedValue) {
             if (isNaN(usedValue)) return '';
 
-            // Get available memory from the sensor
             const availableSensor = flatSensorData['/ram/data/1'];
             if (availableSensor && availableSensor.Value !== undefined) {
                 let availableValue = parseValue(availableSensor.Value);
@@ -1346,26 +810,20 @@
                 }
             }
 
-            // Fallback to just showing used value if available is not available yet
             return usedValue.toFixed(1);
         }
 
-        // Mapping of HTML element IDs to API SensorIds and their properties
-        // This is crucial for linking the UI to the specific data points in your API
         const sensorMapping = {
-            // CPU Performance
             'cpu-total-load': { apiId: '/intelcpu/0/load/0', type: 'Load', barMax: 100 },
             'cpu-max-load': { apiId: '/intelcpu/0/load/1', type: 'Load', barMax: 100 },
             'cpu-package-power': { apiId: '/intelcpu/0/power/0', type: 'Power', fixed: 0 },
             'cpu-cores-power': { apiId: '/intelcpu/0/power/1', type: 'Power', fixed: 0 },
             'cpu-core-voltage': { apiId: '/intelcpu/0/voltage/0', type: 'Voltage', fixed: 3 },
 
-            // CPU Temperatures
             'cpu-package-temp': { apiId: '/intelcpu/0/temperature/10', type: 'Temperature', barMax: 100 },
             'cpu-core-max-temp': { apiId: '/intelcpu/0/temperature/21', type: 'Temperature', barMax: 100 },
             'cpu-core-avg-temp': { apiId: '/intelcpu/0/temperature/22', type: 'Temperature', barMax: 100 },
 
-            // GPU
             'gpu-core-load': { apiId: '/gpu-nvidia/0/load/0', type: 'Load', barMax: 100 },
             'gpu-vram-used': { apiId: '/gpu-nvidia/0/smalldata/1', type: 'SmallData', parseFactor: 1 / 1024, fixed: 1, barApiId: '/gpu-nvidia/0/smalldata/2', formatter: formatVRAM },
             'gpu-core-temp': { apiId: '/gpu-nvidia/0/temperature/0', type: 'Temperature', barMax: 100 },
@@ -1374,26 +832,20 @@
             'gpu-power': { apiId: '/gpu-nvidia/0/power/0', type: 'Power', fixed: 0 },
             'gpu-power-utilization': { apiId: '/gpu-nvidia/0/load/4', type: 'Load', barMax: 100 },
 
-            // Network (Dynamic - will be set automatically)
             'gpu-pcie-rx': { apiId: '/gpu-nvidia/0/throughput/0', type: 'Throughput', parseFactor: 1 / 1000000, fixed: 0 },
             'gpu-pcie-tx': { apiId: '/gpu-nvidia/0/throughput/1', type: 'Throughput', parseFactor: 1 / 1000000, fixed: 0 },
 
-            // Memory
             'memory-combined': { apiId: '/ram/data/0', type: 'Data', fixed: 1, formatter: formatMemory, barApiId: '/ram/load/0', barMax: 100 },
             'virtual-memory-combined': { apiId: '/ram/data/2', type: 'Data', fixed: 1, formatter: formatVirtualMemory, barApiId: '/ram/load/1', barMax: 100 },
         };
 
-        // Dynamic network interface detection
         let networkInterfaceMappingsInitialized = false;
 
-        // Function to find the active network interface
         function findActiveNetworkInterface(sensorData) {
             const networkInterfaces = [];
 
-            // Recursively search for network interfaces
             function searchForNetworks(node) {
                 if (node.Type === 'Network' && node.Children) {
-                    // Look for data upload/download sensors to determine if this interface has traffic
                     let hasDataSensors = false;
                     let uploadSensor = null;
                     let downloadSensor = null;
@@ -1423,10 +875,7 @@
                         }
                     }
 
-                    findDataSensors(node);
-
-                    if (hasDataSensors && uploadSensor && downloadSensor) {
-                        // Get data values to determine which interface is most active
+                    findDataSensors(node); if (hasDataSensors && uploadSensor && downloadSensor) {
                         const uploadData = flatSensorData[uploadSensor];
                         const downloadData = flatSensorData[downloadSensor];
 
@@ -1454,35 +903,27 @@
                 if (node.Children) {
                     node.Children.forEach(child => searchForNetworks(child));
                 }
-            }
+            } searchForNetworks(sensorData);
 
-            searchForNetworks(sensorData);
-
-            // Sort by total data and return the most active interface
-            // Also prioritize Wi-Fi interfaces over others
             networkInterfaces.sort((a, b) => {
-                // Prioritize Wi-Fi interfaces
                 const aIsWifi = a.name.toLowerCase().includes('wi-fi') || a.name.toLowerCase().includes('wifi');
                 const bIsWifi = b.name.toLowerCase().includes('wi-fi') || b.name.toLowerCase().includes('wifi');
 
                 if (aIsWifi && !bIsWifi) return -1;
                 if (!aIsWifi && bIsWifi) return 1;
 
-                // Then sort by data amount
                 return b.totalData - a.totalData;
             });
 
             return networkInterfaces.length > 0 ? networkInterfaces[0] : null;
         }
 
-        // Function to initialize network interface mappings
         function initializeNetworkMappings(sensorData) {
             if (networkInterfaceMappingsInitialized) return;
 
             const activeInterface = findActiveNetworkInterface(sensorData);
 
             if (activeInterface) {
-                // Add dynamic network mappings to the sensor mapping
                 sensorMapping['wifi-download'] = {
                     apiId: activeInterface.throughputDownload,
                     type: 'Throughput',
@@ -1511,15 +952,13 @@
                 console.warn('No active network interface found for dynamic mapping');
             }
         }
+
         const currentAnimatedValues = new Map();
         const targetValues = new Map();
-        const animationFrames = new Map();
-        const currentProgressBarValues = new Map();        // Smooth animation function for numeric values
-        function animateValue(element, targetValue, duration = 500, formatter = null, fixed = 0) {
+        const animationFrames = new Map(); const currentProgressBarValues = new Map(); function animateValue(element, targetValue, duration = 500, formatter = null, fixed = 0) {
             const elementId = element.id || element.className;
             const startValue = currentAnimatedValues.get(elementId) || 0;
 
-            // Skip animation if target value is very close to current value
             if (Math.abs(targetValue - startValue) < 0.01) {
                 const displayValue = formatter ? formatter(targetValue) : targetValue.toFixed(fixed);
                 if (element.textContent !== displayValue) {
@@ -1527,11 +966,8 @@
                 }
                 currentAnimatedValues.set(elementId, targetValue);
                 return;
-            }
+            } const startTime = performance.now();
 
-            const startTime = performance.now();
-
-            // Cancel any existing animation for this element
             if (animationFrames.has(elementId)) {
                 cancelAnimationFrame(animationFrames.get(elementId));
             }
@@ -1540,7 +976,6 @@
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
 
-                // Use easeOutCubic for smooth deceleration
                 const easeProgress = 1 - Math.pow(1 - progress, 3);
 
                 const currentValue = startValue + (targetValue - startValue) * easeProgress;
@@ -1548,7 +983,6 @@
 
                 const displayValue = formatter ? formatter(currentValue) : currentValue.toFixed(fixed);
 
-                // Only update DOM if the display value has actually changed
                 if (element.textContent !== displayValue) {
                     element.textContent = displayValue;
                 }
@@ -1563,18 +997,15 @@
 
             const frameId = requestAnimationFrame(animate);
             animationFrames.set(elementId, frameId);
-        }        // Smooth animation function for progress bars using exponential smoothing
-        function animateProgressBar(element, targetPercentage, smoothingFactor = 0.05) {
+        } function animateProgressBar(element, targetPercentage, smoothingFactor = 0.05) {
             const elementId = element.id || element.className;
 
-            // Initialize current value if not exists
             if (!currentProgressBarValues.has(elementId)) {
                 currentProgressBarValues.set(elementId, parseFloat(element.style.width) || 0);
             }
 
             const currentValue = currentProgressBarValues.get(elementId);
 
-            // Skip animation if target is very close to current value
             if (Math.abs(targetPercentage - currentValue) < 0.05) {
                 const newWidth = `${targetPercentage}%`;
                 if (element.style.width !== newWidth) {
@@ -1584,16 +1015,13 @@
                 return;
             }
 
-            // Cancel any existing animation for this element
             if (animationFrames.has(elementId)) {
                 cancelAnimationFrame(animationFrames.get(elementId));
             }
-
             function animate() {
                 const currentValue = currentProgressBarValues.get(elementId);
                 const difference = targetPercentage - currentValue;
 
-                // Check if we're close enough to the target to stop animating
                 if (Math.abs(difference) < 0.05) {
                     const finalWidth = `${targetPercentage}%`;
                     if (element.style.width !== finalWidth) {
@@ -1604,7 +1032,6 @@
                     return;
                 }
 
-                // Exponential smoothing: new_value = current + smoothing_factor * (target - current)
                 const newValue = currentValue + smoothingFactor * difference;
                 currentProgressBarValues.set(elementId, newValue);
 
@@ -1613,43 +1040,36 @@
                     element.style.width = newWidth;
                 }
 
-                // Continue animation
                 const frameId = requestAnimationFrame(animate);
                 animationFrames.set(elementId, frameId);
             }
 
             const frameId = requestAnimationFrame(animate);
             animationFrames.set(elementId, frameId);
-        }// Function to update a single sensor's UI elements with smooth animations
+        }
         function updateSensorUI(htmlId, value, barMax = null, formatter = null, fixed = 0) {
-            // Early exit for invalid values
             if (value === undefined || value === null) {
                 return;
             }
 
-            // Skip update if value hasn't changed significantly (for performance)
             const lastValue = targetValues.get(htmlId);
             if (lastValue !== undefined && !isNaN(value) && Math.abs(lastValue - value) < 0.01) {
                 return;
             }
 
-            // Cache elements once per update cycle
             const valueElem = getCachedElement(htmlId);
             const barElem = barMax !== null ? getCachedElement(`${htmlId}-bar`) : null;
 
-            // Early exit if no elements exist
             if (!valueElem && !barElem) {
                 return;
             }
 
             targetValues.set(htmlId, value);
 
-            // Handle value element update
             if (valueElem) {
                 if (!isNaN(value)) {
                     animateValue(valueElem, value, 400, formatter, fixed);
                 } else {
-                    // For non-numeric values, update immediately without animation
                     const displayValue = formatter ? formatter(value) : '';
                     if (valueElem.textContent !== displayValue) {
                         valueElem.textContent = displayValue;
@@ -1657,7 +1077,6 @@
                 }
             }
 
-            // Handle progress bar update (only if barMax is provided and valid)
             if (barElem && barMax !== null && barMax > 0 && !isNaN(value)) {
                 const percentage = Math.max(0, Math.min(100, (value / barMax) * 100));
                 animateProgressBar(barElem, percentage);
@@ -1666,42 +1085,34 @@
             }
         }
 
-        // Function to filter out fans with 0 RPM from the visualization
         function filterZeroRpmFans() {
             if (!fansGenerated || Object.keys(fanCardElements).length === 0) {
-                return; // No fans generated yet
+                return;
             }
 
             let visibleFanCount = 0;
 
-            // Check each fan's RPM value and show/hide accordingly
             for (const rpmHtmlId in fanCardElements) {
                 const fanCard = fanCardElements[rpmHtmlId];
                 const config = dynamicSensorMapping[rpmHtmlId];
 
                 if (config && config.apiId) {
-                    const sensor = flatSensorData[config.apiId];
-
-                    if (sensor && sensor.Value !== undefined) {
+                    const sensor = flatSensorData[config.apiId]; if (sensor && sensor.Value !== undefined) {
                         const rpmValue = parseValue(sensor.Value);
 
                         if (!isNaN(rpmValue) && rpmValue > 0) {
-                            // Fan is spinning, show the card
                             fanCard.style.display = '';
                             visibleFanCount++;
                         } else {
-                            // Fan is not spinning (0 RPM), hide the card
                             fanCard.style.display = 'none';
                         }
                     } else {
-                        // No sensor data available, show the card by default
                         fanCard.style.display = '';
                         visibleFanCount++;
                     }
                 }
             }
 
-            // Hide the entire fans section if no fans are visible
             const fansSection = document.getElementById('fans-section');
             if (fansSection) {
                 if (visibleFanCount === 0) {
@@ -1711,48 +1122,33 @@
                 }
             }
         }
-        // Main function to fetch and render sensor data from the API
         async function fetchAndRenderSensorData() {
             try {
                 const response = await fetch('http://localhost:8085/data.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                } const data = await response.json();
 
-                const data = await response.json();
-
-                // Extract hardware names from the API response (only on first run)
                 if (!headersInitialized) {
                     extractHardwareNames(data);
                     updateSectionHeaders();
-                }                // Generate CPU core sections dynamically (only on first run)
-                if (!cpuCoresGenerated) {
+                } if (!cpuCoresGenerated) {
                     generateCpuCoreSections(data);
-                }                // Generate fan sections dynamically (only on first run)
-                if (!fansGenerated) {
+                } if (!fansGenerated) {
                     generateFanSections(data);
                 }
 
-                // Generate storage sections dynamically (only on first run)
                 if (!storageGenerated) {
                     generateStorageSections(data);
                 }
 
-                // Clear and re-flatten the data (only clear on first run or when needed)
                 flattenSensors(data, Object.keys(flatSensorData).length === 0);
 
-                // Initialize network interface mappings (only on first run)
-                initializeNetworkMappings(data);
-
-                // Batch DOM updates using requestAnimationFrame for better performance
-                requestAnimationFrame(() => {
-                    // Combine static and dynamic sensor mappings
+                initializeNetworkMappings(data); requestAnimationFrame(() => {
                     const allSensorMappings = { ...sensorMapping, ...dynamicSensorMapping };
 
-                    // Pre-filter mappings to only update elements that have changed
                     const updatesNeeded = [];
 
-                    // Iterate through all sensor mappings (static + dynamic)
                     for (const htmlId in allSensorMappings) {
                         const config = allSensorMappings[htmlId];
                         const sensor = flatSensorData[config.apiId];
@@ -1763,18 +1159,15 @@
                         if (sensor && sensor.Value !== undefined) {
                             value = parseValue(sensor.Value);
 
-                            // Apply parse factor if defined
                             if (config.parseFactor !== undefined) {
                                 value *= config.parseFactor;
                             }
 
-                            // Early check if value has changed significantly
                             const lastValue = targetValues.get(htmlId);
                             if (lastValue !== undefined && !isNaN(value) && Math.abs(lastValue - value) < 0.01) {
-                                continue; // Skip this update
+                                continue;
                             }
 
-                            // Determine the maximum value for the progress bar
                             if (config.barMax !== undefined) {
                                 barValue = config.barMax;
                             } else if (config.barApiId) {
@@ -1786,7 +1179,6 @@
                                     }
                                 }
                             } else if (sensor.Max !== undefined && config.type === 'Clock') {
-                                // For clocks, use the Max value from the sensor data for bar scaling
                                 barValue = parseValue(sensor.Max);
                                 if (config.parseFactor !== undefined) {
                                     barValue *= config.parseFactor;
@@ -1797,28 +1189,23 @@
                                     barValue *= config.parseFactor;
                                 }
                             }
-                        }
-
-                        // Queue update for processing
-                        updatesNeeded.push({
+                        } updatesNeeded.push({
                             htmlId,
                             value,
                             barValue,
                             formatter: config.formatter,
                             fixed: config.fixed
                         });
-                    }                    // Process all queued updates
+                    }
+
                     updatesNeeded.forEach(update => {
                         updateSensorUI(update.htmlId, update.value, update.barValue, update.formatter, update.fixed);
                     });
 
-                    // Filter out fans with 0 RPM from visualization
                     filterZeroRpmFans();
                 });
-
             } catch (error) {
                 console.error("Error fetching or parsing sensor data:", error);
-                // Reset all sensors on error
                 requestAnimationFrame(() => {
                     const allSensorMappings = { ...sensorMapping, ...dynamicSensorMapping };
                     Object.keys(allSensorMappings).forEach(htmlId => {
@@ -1840,13 +1227,12 @@
             const minutes = Math.floor(seconds / 60);
             const secondsRemaining = Math.floor(seconds % 60);
             return `${days}d ${hours}h ${minutes}m ${secondsRemaining}s`;
-        }        // Initialize the dashboard
+        }
+
         fetchAndRenderSensorData();
 
-        interval_ms = 200
-        let updateInterval = setInterval(fetchAndRenderSensorData, interval_ms);
+        interval_ms = 200; let updateInterval = setInterval(fetchAndRenderSensorData, interval_ms);
 
-        // Pause updates when page is not visible to save resources
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) {
                 clearInterval(updateInterval);
