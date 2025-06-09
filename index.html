@@ -55,7 +55,6 @@
             break-inside: avoid;
             display: inline-block;
             width: 100%;
-            min-width: 320px;
             margin-bottom: var(--gap);
             box-sizing: border-box;
         }
@@ -142,7 +141,6 @@
             font-size: 0.9em;
             color: #b0b0b0;
             flex: 1;
-            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -271,7 +269,6 @@
 
             .glass-pane {
                 padding: var(--card-padding);
-                min-width: 250px;
             }
 
             .sensor-card {
@@ -302,13 +299,6 @@
 
             .sensor-group h2 {
                 font-size: 1.2em;
-            }
-        }
-
-        @media (min-width: 1600px) {
-            .dashboard-container {
-                columns: 380px;
-                max-width: 1600px;
             }
         }
 
@@ -589,6 +579,9 @@
                         <span class="sensor-value" id="gpu-power"></span><span class="sensor-unit">W</span>
                     </div>
                 </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="gpu-power-utilization-bar"></div>
+                </div>
             </div>
             <div class="sensor-card">
                 <div class="icon-value">
@@ -614,7 +607,7 @@
             <div class="sensor-card">
                 <div class="icon-value">
                     <i class="fas fa-memory sensor-icon"></i>
-                    <span class="sensor-label">Physical</span>
+                    <span class="sensor-label">RAM</span>
                     <div class="sensor-value-container">
                         <span class="sensor-value" id="memory-combined"></span><span class="sensor-unit">GB</span>
                     </div>
@@ -647,8 +640,8 @@
             <h2>Network</h2>
             <div class="sensor-card">
                 <div class="icon-value">
-                    <i class="fas fa-wifi sensor-icon"></i>
-                    <span class="sensor-label">Down</span>
+                    <i class="fas fa-arrow-down sensor-icon"></i>
+                    <span class="sensor-label">Download</span>
                     <div class="sensor-value-container">
                         <span class="sensor-value" id="wifi-download"></span><span class="sensor-unit">MB/s</span>
                     </div>
@@ -656,8 +649,8 @@
             </div>
             <div class="sensor-card">
                 <div class="icon-value">
-                    <i class="fas fa-wifi sensor-icon"></i>
-                    <span class="sensor-label">Up</span>
+                    <i class="fas fa-arrow-up sensor-icon"></i>
+                    <span class="sensor-label">Upload</span>
                     <div class="sensor-value-container">
                         <span class="sensor-value" id="wifi-upload"></span><span class="sensor-unit">MB/s</span>
                     </div>
@@ -1075,7 +1068,8 @@
             'gpu-core-temp': { apiId: '/gpu-nvidia/0/temperature/0', type: 'Temperature', barMax: 100 },
             'gpu-hotspot-temp': { apiId: '/gpu-nvidia/0/temperature/2', type: 'Temperature', barMax: 100 },
             'gpu-memory-temp': { apiId: '/gpu-nvidia/0/temperature/3', type: 'Temperature', barMax: 100 },
-            'gpu-power': { apiId: '/gpu-nvidia/0/power/0', type: 'Power', fixed: 0 },            // Memory
+            'gpu-power': { apiId: '/gpu-nvidia/0/power/0', type: 'Power', fixed: 0 },
+            'gpu-power-utilization': { apiId: '/gpu-nvidia/0/load/4', type: 'Load', barMax: 100 },            // Memory
             'memory-combined': { apiId: '/ram/data/0', type: 'Data', fixed: 1, formatter: formatMemory, barApiId: '/ram/load/0', barMax: 100 },
             'virtual-memory-combined': { apiId: '/ram/data/2', type: 'Data', fixed: 1, formatter: formatVirtualMemory, barApiId: '/ram/load/1', barMax: 100 },// Network (Dynamic - will be set automatically)
             'gpu-pcie-rx': { apiId: '/gpu-nvidia/0/throughput/0', type: 'Throughput', parseFactor: 1 / 1000000, fixed: 0 },
