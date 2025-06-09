@@ -418,7 +418,7 @@
             <div class="sensor-card">
                 <div class="icon-value">
                     <i class="fas fa-tachometer-alt sensor-icon"></i>
-                    <span class="sensor-label">Core Load Max</span>
+                    <span class="sensor-label">Core Max Load</span>
                     <div class="sensor-value-container">
                         <span class="sensor-value" id="cpu-max-load"></span><span class="sensor-unit">%</span>
                     </div>
@@ -666,7 +666,7 @@
             <div class="sensor-card">
                 <div class="icon-value">
                     <i class="fas fa-download sensor-icon"></i>
-                    <span class="sensor-label">Tot Down</span>
+                    <span class="sensor-label">Total Down</span>
                     <div class="sensor-value-container">
                         <span class="sensor-value" id="wifi-total-download"></span><span class="sensor-unit">GB</span>
                     </div>
@@ -675,7 +675,7 @@
             <div class="sensor-card">
                 <div class="icon-value">
                     <i class="fas fa-upload sensor-icon"></i>
-                    <span class="sensor-label">Tot Up</span>
+                    <span class="sensor-label">Total Up</span>
                     <div class="sensor-value-container">
                         <span class="sensor-value" id="wifi-total-upload"></span><span class="sensor-unit">GB</span>
                     </div>
@@ -1197,12 +1197,12 @@
                 sensorMapping['wifi-total-download'] = {
                     apiId: activeInterface.downloadSensor,
                     type: 'Data',
-                    fixed: 0
+                    fixed: 1
                 };
                 sensorMapping['wifi-total-upload'] = {
                     apiId: activeInterface.uploadSensor,
                     type: 'Data',
-                    fixed: 0
+                    fixed: 1
                 };
 
                 networkInterfaceMappingsInitialized = true;
