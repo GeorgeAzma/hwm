@@ -219,11 +219,11 @@
                     <i class="fas fa-memory sensor-icon"></i>
                     <span class="sensor-label">RAM</span>
                     <div class="sensor-value-container">
-                        <span class="sensor-value" id="memory-combined"></span><span class="sensor-unit">GB</span>
+                        <span class="sensor-value" id="ram"></span><span class="sensor-unit">GB</span>
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-bar-fill" id="memory-combined-bar"></div>
+                    <div class="progress-bar-fill" id="ram-bar"></div>
                 </div>
             </div>
             <div class="sensor-card">
@@ -231,12 +231,11 @@
                     <i class="fas fa-database sensor-icon"></i>
                     <span class="sensor-label">Virtual</span>
                     <div class="sensor-value-container">
-                        <span class="sensor-value" id="virtual-memory-combined"></span><span
-                            class="sensor-unit">GB</span>
+                        <span class="sensor-value" id="virtual-ram"></span><span class="sensor-unit">GB</span>
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-bar-fill" id="virtual-memory-combined-bar"></div>
+                    <div class="progress-bar-fill" id="virtual-ram-bar"></div>
                 </div>
             </div>
         </div>
@@ -412,8 +411,7 @@
                     const htmlId = generateHtmlId(coreLoad.Text, 'load');
                     dynamicSensorMapping[htmlId] = {
                         apiId: coreLoad.SensorId,
-                        type: 'Load',
-                        barMax: 100
+                        barApiId: coreLoad.SensorId,
                     };
                 });
             }
@@ -429,7 +427,7 @@
                     dynamicSensorMapping[htmlId] = {
                         apiId: coreTemp.SensorId,
                         type: 'Temperature',
-                        barMax: 100
+                        barApiId: coreTemp.SensorId,
                     };
                 });
             }
@@ -636,7 +634,6 @@
                 dynamicSensorMapping[usedSpaceId] = {
                     apiId: sensors.usedSpace.SensorId,
                     type: 'Load',
-                    barMax: 100,
                     formatter: (value) => formatStorageCapacity(value, deviceName),
                     fixed: 1
                 };
@@ -654,7 +651,7 @@
                 dynamicSensorMapping[totalActivityId] = {
                     apiId: sensors.totalActivity.SensorId,
                     type: 'Load',
-                    barMax: 100,
+                    barApiId: sensors.totalActivity.SensorId,
                     fixed: 1
                 };
             } if (sensors.readRate) {
@@ -696,7 +693,6 @@
                 )); dynamicSensorMapping[tempId] = {
                     apiId: tempSensor.SensorId,
                     type: 'Temperature',
-                    barMax: 100,
                     fixed: 0
                 };
             }); if (sensors.dataRead) {
@@ -778,11 +774,13 @@
 
             return bar;
         }
+
         function parseValue(valueString) {
             if (!valueString) return NaN;
             const match = valueString.match(/(-?\d+(\.\d+)?)/);
             return match ? parseFloat(match[1]) : NaN;
         }
+
         function formatVRAM(usedValue) {
             if (isNaN(usedValue)) return '';
 
@@ -790,8 +788,7 @@
             if (totalSensor && totalSensor.Value !== undefined) {
                 let totalValue = parseValue(totalSensor.Value);
                 if (!isNaN(totalValue)) {
-                    totalValue /= 1024;
-                    return `${usedValue.toFixed(1)} / ${totalValue.toFixed(0)}`;
+                    return `${(usedValue / 1024).toFixed(1)} / ${(totalValue / 1024).toFixed(0)}`;
                 }
             }
 
@@ -814,29 +811,29 @@
         }
 
         const sensorMapping = {
-            'cpu-total-load': { apiId: '/intelcpu/0/load/0', type: 'Load', barMax: 100 },
-            'cpu-max-load': { apiId: '/intelcpu/0/load/1', type: 'Load', barMax: 100 },
+            'cpu-total-load': { apiId: '/intelcpu/0/load/0', type: 'Load', barApiId: '/intelcpu/0/load/0' },
+            'cpu-max-load': { apiId: '/intelcpu/0/load/1', type: 'Load', barApiId: '/intelcpu/0/load/1' },
             'cpu-package-power': { apiId: '/intelcpu/0/power/0', type: 'Power', fixed: 0 },
             'cpu-cores-power': { apiId: '/intelcpu/0/power/1', type: 'Power', fixed: 0 },
             'cpu-core-voltage': { apiId: '/intelcpu/0/voltage/0', type: 'Voltage', fixed: 3 },
 
-            'cpu-package-temp': { apiId: '/intelcpu/0/temperature/10', type: 'Temperature', barMax: 100 },
-            'cpu-core-max-temp': { apiId: '/intelcpu/0/temperature/21', type: 'Temperature', barMax: 100 },
-            'cpu-core-avg-temp': { apiId: '/intelcpu/0/temperature/22', type: 'Temperature', barMax: 100 },
+            'cpu-package-temp': { apiId: '/intelcpu/0/temperature/10', type: 'Temperature', barApiId: '/intelcpu/0/temperature/10' },
+            'cpu-core-max-temp': { apiId: '/intelcpu/0/temperature/21', type: 'Temperature', barApiId: '/intelcpu/0/temperature/21' },
+            'cpu-core-avg-temp': { apiId: '/intelcpu/0/temperature/22', type: 'Temperature', barApiId: '/intelcpu/0/temperature/22' },
 
-            'gpu-core-load': { apiId: '/gpu-nvidia/0/load/0', type: 'Load', barMax: 100 },
-            'gpu-vram-used': { apiId: '/gpu-nvidia/0/smalldata/1', type: 'SmallData', parseFactor: 1 / 1024, fixed: 1, barApiId: '/gpu-nvidia/0/smalldata/2', formatter: formatVRAM },
-            'gpu-core-temp': { apiId: '/gpu-nvidia/0/temperature/0', type: 'Temperature', barMax: 100 },
-            'gpu-hotspot-temp': { apiId: '/gpu-nvidia/0/temperature/2', type: 'Temperature', barMax: 100 },
-            'gpu-memory-temp': { apiId: '/gpu-nvidia/0/temperature/3', type: 'Temperature', barMax: 100 },
+            'gpu-core-load': { apiId: '/gpu-nvidia/0/load/0', type: 'Load', barApiId: '/gpu-nvidia/0/load/0' },
+            'gpu-vram-used': { apiId: '/gpu-nvidia/0/smalldata/1', type: 'SmallData', parseFactor: 1, fixed: 1, barApiId: '/gpu-nvidia/0/load/3', formatter: formatVRAM },
+            'gpu-core-temp': { apiId: '/gpu-nvidia/0/temperature/0', type: 'Temperature', barApiId: '/gpu-nvidia/0/temperature/0' },
+            'gpu-hotspot-temp': { apiId: '/gpu-nvidia/0/temperature/2', type: 'Temperature', barApiId: '/gpu-nvidia/0/temperature/2' },
+            'gpu-memory-temp': { apiId: '/gpu-nvidia/0/temperature/3', type: 'Temperature', barApiId: '/gpu-nvidia/0/temperature/3' },
             'gpu-power': { apiId: '/gpu-nvidia/0/power/0', type: 'Power', fixed: 0 },
-            'gpu-power-utilization': { apiId: '/gpu-nvidia/0/load/4', type: 'Load', barMax: 100 },
+            'gpu-power-utilization': { apiId: '/gpu-nvidia/0/load/4', type: 'Load', barApiId: '/gpu-nvidia/0/load/4' },
 
             'gpu-pcie-rx': { apiId: '/gpu-nvidia/0/throughput/0', type: 'Throughput', parseFactor: 1 / 1000000, fixed: 0 },
             'gpu-pcie-tx': { apiId: '/gpu-nvidia/0/throughput/1', type: 'Throughput', parseFactor: 1 / 1000000, fixed: 0 },
 
-            'memory-combined': { apiId: '/ram/data/0', type: 'Data', fixed: 1, formatter: formatMemory, barApiId: '/ram/load/0', barMax: 100 },
-            'virtual-memory-combined': { apiId: '/ram/data/2', type: 'Data', fixed: 1, formatter: formatVirtualMemory, barApiId: '/ram/load/1', barMax: 100 },
+            'ram': { apiId: '/ram/data/0', type: 'Data', fixed: 1, formatter: formatMemory, barApiId: '/ram/load/0' },
+            'virtual-ram': { apiId: '/ram/data/2', type: 'Data', fixed: 1, formatter: formatVirtualMemory, barApiId: '/ram/load/1' },
         };
 
         let networkInterfaceMappingsInitialized = false;
@@ -1047,7 +1044,8 @@
             const frameId = requestAnimationFrame(animate);
             animationFrames.set(elementId, frameId);
         }
-        function updateSensorUI(htmlId, value, barMax = null, formatter = null, fixed = 0) {
+
+        function updateSensorUI(htmlId, value, barValue = null, formatter = null, fixed = 0) {
             if (value === undefined || value === null) {
                 return;
             }
@@ -1058,7 +1056,7 @@
             }
 
             const valueElem = getCachedElement(htmlId);
-            const barElem = barMax !== null ? getCachedElement(`${htmlId}-bar`) : null;
+            const barElem = barValue !== null ? getCachedElement(`${htmlId}-bar`) : null;
 
             if (!valueElem && !barElem) {
                 return;
@@ -1077,10 +1075,10 @@
                 }
             }
 
-            if (barElem && barMax !== null && barMax > 0 && !isNaN(value)) {
-                const percentage = Math.max(0, Math.min(100, (value / barMax) * 100));
+            if (barElem && barValue !== null && barValue >= 0 && !isNaN(value)) {
+                const percentage = Math.max(0, Math.min(100, barValue));
                 animateProgressBar(barElem, percentage);
-            } else if (barElem && barMax !== null) {
+            } else if (barElem && barValue !== null) {
                 animateProgressBar(barElem, 0);
             }
         }
@@ -1168,9 +1166,7 @@
                                 continue;
                             }
 
-                            if (config.barMax !== undefined) {
-                                barValue = config.barMax;
-                            } else if (config.barApiId) {
+                            if (config.barApiId) {
                                 const barSensor = flatSensorData[config.barApiId];
                                 if (barSensor && barSensor.Value !== undefined) {
                                     barValue = parseValue(barSensor.Value);

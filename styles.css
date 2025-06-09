@@ -4,19 +4,15 @@
     --text-color: #e0e0e0;
     --accent-color-1: #8d44f6;
     --accent-color-2: #44a6f6;
-    --accent-color-3: #44f6d7;
-    --accent-color-4: #f6e044;
-    --accent-color-5: #f6448d;
     --gradient-1: linear-gradient(135deg, var(--accent-color-1), var(--accent-color-2));
-    --gradient-2: linear-gradient(135deg, var(--accent-color-3), var(--accent-color-4));
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.3);
     --blur-strength: 10px;
     --border-radius-main: 20px;
     --border-radius-card: 12px;
-    --card-padding: 12px;
-    --gap: 16px;
+    --card-padding: 8px;
+    --gap: 8px;
     overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -148,12 +144,12 @@ body {
     padding-inline: 0px;
 
     .sensor-value-container {
-        margin-right: var(--card-padding);
-        margin-bottom: calc(var(--card-padding) * 0.5);
+        margin-right: 12px;
+        margin-bottom: 6px;
     }
 
     .sensor-icon {
-        margin-left: var(--card-padding);
+        margin-left: 12px;
     }
 }
 
